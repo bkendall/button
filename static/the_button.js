@@ -12,7 +12,7 @@ function set_state(state) {
 };
 
 var host = $('div#hostname').html();
-var ws = new WebSocket('ws://' + host + '/ws);
+var ws = new WebSocket('ws://' + host + '/ws');
 ws.onopen = function() {
     ws.send('{}');
 };
