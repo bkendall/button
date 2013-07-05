@@ -25,9 +25,11 @@ class ButtonWebSocket(tornado.websocket.WebSocketHandler):
         print message
         data = json.loads(message)
         if 'state' in data:
-            self.write_message(json.dumps(
-                {'state': 0 if data['state'] == 1 else 1}
-            ))
+            new_state = 0 if data['state'] == 1 else 1
+            for conn, state in connections.iteritems():
+                conn.write_message(json.dumps(
+                    {'state': new_state}
+                ))
 
     def on_close(self):
         if self not in connections:
