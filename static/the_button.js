@@ -1,4 +1,7 @@
 var btn = $('button#the_button');
+var host = $('div#hostname').html();
+var ws = new WebSocket('ws://' + host + '/ws');
+
 function set_state(state) {
     if (state === 1) {
         btn.removeClass('btn-danger');
@@ -11,18 +14,25 @@ function set_state(state) {
     }
 };
 
-var host = $('div#hostname').html();
-var ws = new WebSocket('ws://' + host + '/ws');
 ws.onopen = function() {
+    if (ws.readyState != 1) {
+        console.log('WS not open.');
+        return;
+    }
     ws.send('{}');
 };
+
 ws.onmessage = function(e) {
-    data = $.parseJSON(e.data);
-    console.log(data);
+    var data = $.parseJSON(e.data);
     set_state(data.state);
 };
 
 btn.click(function() {
-    state = btn.hasClass('btn-danger') ? 0 : 1;
-    ws.send(JSON.stringify({'state': state}));
+    if (ws.readyState != 1) {
+        console.log('WS not open to send.');
+        return;
+    }
+    var state = btn.hasClass('btn-danger') ? 0 : 1;
+    var data = JSON.stringify({'state': state});
+    ws.send(data);
 });
