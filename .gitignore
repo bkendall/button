@@ -1,4 +1,5 @@
 *.swp
 *.pyc
+*.un~
 supervisord.log
 supervisord.pid
