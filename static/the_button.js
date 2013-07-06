@@ -19,7 +19,7 @@ ws.onopen = function() {
         console.log('WS not open.');
         return;
     }
-    ws.send('{}');
+    ws.send(JSON.stringify({'init': true}));
 };
 
 ws.onmessage = function(e) {

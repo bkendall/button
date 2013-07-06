@@ -5,6 +5,9 @@ import json
 import os
 
 connections = {}
+properties = {
+    'state': 0,
+}
 
 class BaseRequestHandler(tornado.web.RequestHandler):
     def get(self):
@@ -18,17 +21,21 @@ class ButtonWebSocket(tornado.websocket.WebSocketHandler):
         else:
             connections[self] = 0
             self.write_message(json.dumps(
-                {'state': 0}
+                {'state': properties['state']}
             ))
 
     def on_message(self, message):
-        print message
         data = json.loads(message)
-        if 'state' in data:
+        if 'init' in data:
+            self.write_message(json.dumps(
+                {'state': properties['state']}
+            ))
+        elif 'state' in data:
             new_state = 0 if data['state'] == 1 else 1
-            for conn, state in connections.iteritems():
+            properties['state'] = new_state
+            for conn, val in connections.iteritems():
                 conn.write_message(json.dumps(
-                    {'state': new_state}
+                    {'state': properties['state']}
                 ))
 
     def on_close(self):
