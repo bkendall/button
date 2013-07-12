@@ -9,6 +9,10 @@ properties = {
     'state': 0,
 }
 
+m_welcome = 'Welcome! There are %d total connections'
+m_state = 'The state has been changed to %s'
+m_user = 'There are now %d connections'
+
 class BaseRequestHandler(tornado.web.RequestHandler):
     def get(self):
         self.render('button.html', host=self.request.host)
@@ -23,19 +27,30 @@ class ButtonWebSocket(tornado.websocket.WebSocketHandler):
             self.write_message(json.dumps(
                 {'state': properties['state']}
             ))
+        for conn, val in connections.iteritems():
+            if conn == self: continue
+            conn.write_message(json.dumps(
+                {'message': m_user % len(connections)}
+            ))
 
     def on_message(self, message):
         data = json.loads(message)
         if 'init' in data:
             self.write_message(json.dumps(
-                {'state': properties['state']}
+                {'state': properties['state'],
+                 'message': (m_welcome + '\n' + m_state) % 
+                    (len(connections),
+                    'on' if properties['state'] == 1 else 'off')
+                }
             ))
         elif 'state' in data:
             new_state = 0 if data['state'] == 1 else 1
             properties['state'] = new_state
             for conn, val in connections.iteritems():
                 conn.write_message(json.dumps(
-                    {'state': properties['state']}
+                    {'state': properties['state'],
+                     'message': m_state %
+                        ('on' if properties['state'] == 1 else 'off')}
                 ))
 
     def on_close(self):
@@ -43,6 +58,10 @@ class ButtonWebSocket(tornado.websocket.WebSocketHandler):
             print 'Connection to delete does not exist'
         else:
             del connections[self]
+            for conn, val in connections.iteritems():
+                conn.write_message(json.dumps(
+                    {'message': m_user % len(connections)}
+                ))
 
 settings = {
     'static_path': os.path.join(os.path.dirname(os.path.abspath(__file__)), "static"),

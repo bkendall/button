@@ -1,12 +1,32 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
 <link href="{{ static_url('bootstrap.min.css') }}" rel="stylesheet" />
 <script src="{{ static_url('jquery.min.js') }}"></script>
+<style>
+body {
+    margin-top: 20px;
+}
+.center-text {
+    text-align: center;
+}
+.no-resize {
+    resize: none;
+}
+</style>
 </head>
 <body>
-<div style="width: 100%; text-align: center;">
-<button class="btn btn-danger" id="the_button">End World</button>
+<div class="container">
+<div class="row">
+<div class="span5 center-text">
+<button class="btn btn-large btn-danger" id="the_button">End World</button>
 </div>
+<div class="span7 center-text">
+<textarea id="messages" readonly rows="10" class="input-block-level no-resize">
+</textarea>
+</div>
+</div> <!-- .row -->
+</div> <!-- .container -->
 <div style="display:none;" id="hostname">{{ host }}</div>
 <script src="{{ static_url('the_button.js') }}"></script>
 <script>

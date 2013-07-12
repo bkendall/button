@@ -1,4 +1,5 @@
 var btn = $('button#the_button');
+var messages = $('textarea#messages');
 var host = $('div#hostname').html();
 var ws = new WebSocket('ws://' + host + '/ws');
 
@@ -14,25 +15,35 @@ function set_state(state) {
     }
 };
 
+messages.on('change', function() {
+    messages.scrollTop(messages[0].scrollHeight);
+});
+
+ws.onerror = function() {
+    console.log('WS has an error.');
+}
+
 ws.onopen = function() {
-    if (ws.readyState != 1) {
-        console.log('WS not open.');
-        return;
-    }
-    ws.send(JSON.stringify({'init': true}));
+    ws.send(JSON.stringify(
+        {'init': true}
+    ));
 };
 
 ws.onmessage = function(e) {
     var data = $.parseJSON(e.data);
-    set_state(data.state);
+    if (data.state !== undefined) {
+        set_state(data.state);
+    }
+    if (data.message !== undefined) {
+        var date = new Date();
+        messages.append(date.toLocaleTimeString() + ': ' +
+                        data.message + '\n');
+        messages.change();
+    }
 };
 
 btn.click(function() {
-    if (ws.readyState != 1) {
-        console.log('WS not open to send.');
-        return;
-    }
-    var state = btn.hasClass('btn-danger') ? 0 : 1;
-    var data = JSON.stringify({'state': state});
-    ws.send(data);
+    ws.send(JSON.stringify(
+        {'state': btn.hasClass('btn-danger') ? 0 : 1}
+    ));
 });
