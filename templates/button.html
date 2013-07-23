@@ -16,20 +16,28 @@ body {
 </style>
 </head>
 <body>
+
 <div class="container">
 <div class="row">
+
 <div class="span5 center-text">
 <button class="btn btn-large btn-danger" id="the_button">End World</button>
-</div>
+</div> <!-- .span5 -->
+
 <div class="span7 center-text">
 <textarea id="messages" readonly rows="10" class="input-block-level no-resize">
 </textarea>
-</div>
+<div class="controls controls-row">
+<input id="message" type="text" class="span6"/>
+<button class="btn btn-primary span1" id="send_message">Send</button>
+</div> <!-- .controls-row -->
+</div> <!-- .span7 -->
+
 </div> <!-- .row -->
 </div> <!-- .container -->
+
 <div style="display:none;" id="hostname">{{ host }}</div>
 <script src="{{ static_url('the_button.js') }}"></script>
-<script>
 <script>
  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -38,6 +46,6 @@ body {
  ga('create', 'UA-20672078-2', 'bryankendall.me');
  ga('send', 'pageview');
 </script>
-</script>
+
 </body>
 </html>

@@ -1,8 +1,10 @@
 var btn = $('button#the_button');
 var messages = $('textarea#messages');
+var send_btn = $('button#send_message');
 var host = $('div#hostname').html();
 var ws = new WebSocket('ws://' + host + '/ws');
 
+// ====== HELPER FUNCTIONS ======
 function set_state(state) {
     if (state === 1) {
         btn.removeClass('btn-danger');
@@ -15,6 +17,7 @@ function set_state(state) {
     }
 };
 
+// ====== WEBSOCKET SETUP ======
 messages.on('change', function() {
     messages.scrollTop(messages[0].scrollHeight);
 });
@@ -42,8 +45,22 @@ ws.onmessage = function(e) {
     }
 };
 
+// ====== ELEMENT SETUP ======
 btn.click(function() {
     ws.send(JSON.stringify(
         {'state': btn.hasClass('btn-danger') ? 0 : 1}
     ));
+});
+
+send_btn.click(function() {
+    var message = $('input#message').val();
+    if (message === '') return;
+    ws.send(JSON.stringify(
+        {'message': message}
+    ));
+    $('input#message').val('');
+});
+
+$('input#message').keyup(function(e) {
+    if (e.keyCode === 13) send_btn.click();
 });

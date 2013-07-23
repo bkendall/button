@@ -1,3 +1,4 @@
+import tornado.autoreload
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
@@ -52,6 +53,12 @@ class ButtonWebSocket(tornado.websocket.WebSocketHandler):
                      'message': m_state %
                         ('on' if properties['state'] == 1 else 'off')}
                 ))
+        elif 'message' in data:
+            message = '%s: %s' % (str(id(self)), data['message'])
+            for conn, val in connections.iteritems():
+                conn.write_message(json.dumps(
+                    {'message': message}
+                ))
 
     def on_close(self):
         if self not in connections:
@@ -63,8 +70,10 @@ class ButtonWebSocket(tornado.websocket.WebSocketHandler):
                     {'message': m_user % len(connections)}
                 ))
 
+this_path = os.path.dirname(os.path.abspath(__file__))
 settings = {
-    'static_path': os.path.join(os.path.dirname(os.path.abspath(__file__)), "static"),
+    'static_path': os.path.join(this_path, 'static'),
+    'template_path': os.path.join(this_path, 'templates'),
 }
 
 application = tornado.web.Application([
@@ -74,4 +83,9 @@ application = tornado.web.Application([
 
 if __name__ == '__main__':
     application.listen(9900)
-    tornado.ioloop.IOLoop.instance().start()
+    for (path, dirs, files) in os.walk(settings['template_path']):
+        for item in files:
+            tornado.autoreload.watch(os.path.join(path, item))
+    io_loop = tornado.ioloop.IOLoop.instance()
+    tornado.autoreload.start(io_loop)
+    io_loop.start()
