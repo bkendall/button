@@ -3,6 +3,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import json
+import md5
 import os
 
 connections = {}
@@ -54,7 +55,8 @@ class ButtonWebSocket(tornado.websocket.WebSocketHandler):
                         ('on' if properties['state'] == 1 else 'off')}
                 ))
         elif 'message' in data:
-            message = '%s: %s' % (str(id(self)), data['message'])
+            message = ('%s: %s') % (md5.new(str(id(self))).hexdigest()[0:5],
+                                    data['message'])
             for conn, val in connections.iteritems():
                 conn.write_message(json.dumps(
                     {'message': message}
