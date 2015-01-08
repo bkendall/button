@@ -2,7 +2,7 @@ var btn = $('button#the_button');
 var messages = $('textarea#messages');
 var send_btn = $('button#send_message');
 var host = $('div#hostname').html();
-var ws = new WebSocket('/ws');
+var ws = new WebSocket((window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws');
 
 // ====== HELPER FUNCTIONS ======
 function set_state(state) {
